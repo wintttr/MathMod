@@ -8,6 +8,11 @@ namespace MinQ
 {
     class Compute
     {
+        public static double FindError(ICollection<double> X, ICollection<double> Y, Func<double, double> f) 
+        {
+            return (from (double x, double y) p in X.Zip(Y) select Math.Pow(f(p.x) - p.y, 2)).Sum();
+        }
+
         public static (double, double) LinearInterp(ICollection<double> Xs, ICollection<double> Ys)
         {
             int n = Xs.Count;

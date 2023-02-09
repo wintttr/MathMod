@@ -46,18 +46,6 @@ namespace MinQ
             plot.InvalidatePlot(false);
         }
 
-        double FindError(Func<double, double> f)
-        {
-            double s = 0;
-
-            for (int i = 0; i < X.Count; i++)
-            {
-                s += Math.Pow(f(X[i]) - Y[i], 2);
-            }
-
-            return Math.Round(s, 5);
-        }
-
         void AddCheckBox(String content, object tag)
         {
             var cb = new CheckBox { Content = content, Tag = tag, IsChecked = true };
@@ -73,9 +61,9 @@ namespace MinQ
             if (s.Tag == null)
                 throw new Exception("Тег почему-то нулёвый.........");
 
-            String content = String.Format("{0} ({1})", title, FindError((Func<double, double>)s.Tag));
+            String content = String.Format("{0} ({1})", title, Compute.FindError(X, Y, (Func<double, double>)s.Tag));
 
-            AddCheckBox(content, s);            
+            AddCheckBox(content, s);
         }
 
         void AddPoints(ICollection<double> X, ICollection<double> Y, String title, MainViewModel m)
