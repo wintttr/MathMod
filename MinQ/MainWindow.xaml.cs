@@ -20,6 +20,20 @@ namespace MinQ
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    /// 
+
+    class Function
+    {
+        public Func<double, double> f { get; set; }
+        public ICollection<(String, double)> attrs { get; set; }
+
+        public Function(Func<double, double> f, ICollection<(String, double)> attrs)
+        {
+            this.f = f;
+            this.attrs = attrs;
+        }
+    }
+    
     public partial class MainWindow : Window
     {
         List<double> X, Y;
@@ -61,17 +75,26 @@ namespace MinQ
             listBox.Items.Add(content);
         }
 
-        void AddCurve(Func<double, double> f, String title, MainViewModel m)
+        void AddCurve(Function func, String title, MainViewModel m)
         {
-            var s = m.AddFunc(f, title);
+            var s = m.AddFunc(func.f, title);
 
             if (s.Tag == null)
                 throw new Exception("Тег почему-то нулёвый.........");
 
             double err = Compute.FindError(X, Y, (Func<double, double>)s.Tag);
 
-            String content = String.Format("{0} ({1:F5})", title, err);
-            AddCheckBox(content, s);
+            String checkbox_content = String.Format("{0} ({1:F5})", title, err);
+            AddCheckBox(checkbox_content, s);
+
+            String args = String.Empty;
+            foreach ((String c, double d) in func.attrs)
+                args += String.Format("{0} = {1:F4}, ", c, d);
+            args = args.Trim();
+            args = args.Trim(',');
+
+            String listitem_content = String.Format("{0} ({1})", title, args);
+            AddListItem(listitem_content);
 
             ErrorList.Add((title, err));
         }
@@ -103,22 +126,19 @@ namespace MinQ
             (double a, double b) exp_coeff = Compute.ExponentialInterp(X, Y);
             (double a, double b, double c) quad_coeff = Compute.QuadraticInterp(X, Y);
 
+            List<(String, double)> LinCoeffs = new() { ("a", lin_coeff.a), ("b", lin_coeff.b)};
+            List<(String, double)> PowCoeffs = new() { ("a", pow_coeff.a), ("b", pow_coeff.b) };
+            List<(String, double)> ExpCoeffs = new() { ("a", exp_coeff.a), ("b", exp_coeff.b) };
+            List<(String, double)> QuadCoeffs = new() { ("a", quad_coeff.a), ("b", quad_coeff.b), ("c", quad_coeff.c) };
+
             AddPoints(X, Y, "Original", m);
 
-            AddCurve((x) => Compute.Linear(x, lin_coeff.a, lin_coeff.b), "Linear", m);
-            AddListItem(String.Format("Linear (a = {0:F4}, b = {1:F4})", lin_coeff.a, lin_coeff.b));
-
-            AddCurve((x) => Compute.Power(x, pow_coeff.a, pow_coeff.b), "Power", m);
-            AddListItem(String.Format("Power (a = {0:F4}, b = {1:F4})", pow_coeff.a, pow_coeff.b));
-
-            AddCurve((x) => Compute.Exponential(x, exp_coeff.a, exp_coeff.b), "Exponential", m);
-            AddListItem(String.Format("Exponential (a = {0:F4}, b = {1:F4})", exp_coeff.a, exp_coeff.b));
-
-            AddCurve((x) => Compute.Quadratic(x, quad_coeff.a, quad_coeff.b, quad_coeff.c), "Quadratic", m);
-            AddListItem(String.Format("Quadratic (a = {0:F4}, b = {1:F4}, c = {2:F4})", quad_coeff.a, quad_coeff.b, quad_coeff.c));
+            AddCurve(new Function((x) => Compute.Linear(x, lin_coeff.a, lin_coeff.b), LinCoeffs), "Linear", m);
+            AddCurve(new Function((x) => Compute.Power(x, pow_coeff.a, pow_coeff.b), PowCoeffs), "Power", m);
+            AddCurve(new Function((x) => Compute.Exponential(x, exp_coeff.a, exp_coeff.b), ExpCoeffs), "Exponential", m);
+            AddCurve(new Function((x) => Compute.Quadratic(x, quad_coeff.a, quad_coeff.b, quad_coeff.c), QuadCoeffs), "Quadratic", m);
 
             plot.Model = m.MyModel;
-            
             closest.Content = String.Format("The closest func is {0}", ErrorList.MinBy((x) => x.Item2).Item1);
         }
     }
