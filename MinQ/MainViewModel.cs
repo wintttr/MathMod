@@ -15,58 +15,41 @@ namespace MinQ
 {
     public class MainViewModel
     {
-        public delegate double func(double x);
-
-        Func<double, double> GetLinear(ICollection<double> Xs, ICollection<double> Ys)
+        public MainViewModel(String title, double MinX, double MaxX, double step = 0.1)
         {
-            (double a, double b) = Compute.LinearInterp(Xs, Ys);
-            return (x) => Compute.Linear(x, a, b);
-        }
+            _step = step;
+            _MinX = MinX;
+            _MaxX = MaxX;
 
-        Func<double, double> GetPower(ICollection<double> Xs, ICollection<double> Ys)
-        {
-            (double a, double b) = Compute.PowerInterp(Xs, Ys);
-            return (x) => Compute.Power(x, a, b);
-        }
-
-        Func<double, double> GetExponential(ICollection<double> Xs, ICollection<double> Ys)
-        {
-            (double a, double b) = Compute.ExponentialInterp(Xs, Ys);
-            return (x) => Compute.Exponential(x, a, b);
-        }
-
-        Func<double, double> GetQuadratic(ICollection<double> Xs, ICollection<double> Ys)
-        {
-            (double a, double b, double c) = Compute.QuadraticInterp(Xs, Ys);
-            return (x) => Compute.Quadratic(x, a, b, c);
-        }
-
-        public MainViewModel()
-        {
-            List<double> X = new() { 10, 15, 20, 25, 30, 35 };
-            List<double> Y = new() { 4.3, 3.3, 2.68, 2.25, 1.9, 1.7 };
-
-            MyModel = new PlotModel { Title = "Метод минимальных квадратов", AxisTierDistance = 0.1 };
+            MyModel = new PlotModel { Title = title };
 
             MyModel.Legends.Add(new Legend
             {
                 LegendPosition = LegendPosition.RightTop,
             });
+        }
 
-            var scatterSeries = new ScatterSeries { MarkerType = MarkerType.Circle, Title = "Original"};
-            foreach((double x, double y) in X.Zip(Y))
-            {
-                scatterSeries.Points.Add(new ScatterPoint(x, y, 4));
-            }
+        public Series AddFunc(Func<double, double> f, String title)
+        {
+            Series s = new FunctionSeries(f, _MinX, _MaxX, _step, title);
+            MyModel.Series.Add(s);
+            s.Tag = f;
+            return s;
+        }
+
+        public Series AddScatterPoints(ICollection<ScatterPoint> Points, String title)
+        {
+            var scatterSeries = new ScatterSeries { MarkerType = MarkerType.Circle, Title = title};
+
+            scatterSeries.Points.AddRange(Points);
 
             MyModel.Series.Add(scatterSeries);
 
-            MyModel.Series.Add(new FunctionSeries(GetLinear(X, Y), X.Min(), X.Max(), 0.1, "Linear"));
-            MyModel.Series.Add(new FunctionSeries(GetPower(X, Y), X.Min(), X.Max(), 0.1, "Power"));
-            MyModel.Series.Add(new FunctionSeries(GetExponential(X, Y), X.Min(), X.Max(), 0.1, "Exp"));
-            MyModel.Series.Add(new FunctionSeries(GetQuadratic(X, Y), X.Min(), X.Max(), 0.1, "Quadratic"));
+            return scatterSeries;
         }
 
         public PlotModel MyModel { get; private set; }
+        private readonly double _step;
+        private readonly double _MinX, _MaxX;
     }
 }

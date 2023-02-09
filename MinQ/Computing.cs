@@ -8,7 +8,6 @@ namespace MinQ
 {
     class Compute
     {
-        
         public static (double, double) LinearInterp(ICollection<double> Xs, ICollection<double> Ys)
         {
             int n = Xs.Count;
