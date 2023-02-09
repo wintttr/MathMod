@@ -6,13 +6,24 @@
         xmlns:local="clr-namespace:MinQ"
         xmlns:oxy="http://oxyplot.org/wpf" x:Class="MinQ.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="МНК" Height="450" Width="1000">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="4*"></ColumnDefinition>
+            <ColumnDefinition Width="2.5*"></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <oxy:PlotView x:Name="plot" Grid.Column="0"/>
-        <StackPanel x:Name="stackPanel" Grid.Column="1"></StackPanel>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition Height="2*"></RowDefinition>
+                <RowDefinition Height="0.2*"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <StackPanel x:Name="stackPanel"></StackPanel>
+            <ListBox x:Name="listBox" Margin="10px" Grid.Row="1"></ListBox>
+            <Label x:Name="closest" Grid.Row="2"></Label>
+        </Grid>
+        
+        <oxy:PlotView x:Name="plot"/>
     </Grid>
 </Window>

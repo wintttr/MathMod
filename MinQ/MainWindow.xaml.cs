@@ -24,6 +24,8 @@ namespace MinQ
     {
         List<double> X, Y;
 
+        List<(String, double)> ErrorList = new();
+
         void checkbox_Checked(object sender, RoutedEventArgs ev)
         {
             var cb = (CheckBox)sender;
@@ -54,6 +56,11 @@ namespace MinQ
             stackPanel.Children.Add(cb);
         }
 
+        void AddListItem(String content)
+        {
+            listBox.Items.Add(content);
+        }
+
         void AddCurve(Func<double, double> f, String title, MainViewModel m)
         {
             var s = m.AddFunc(f, title);
@@ -61,9 +68,12 @@ namespace MinQ
             if (s.Tag == null)
                 throw new Exception("Тег почему-то нулёвый.........");
 
-            String content = String.Format("{0} ({1})", title, Compute.FindError(X, Y, (Func<double, double>)s.Tag));
+            double err = Compute.FindError(X, Y, (Func<double, double>)s.Tag);
 
+            String content = String.Format("{0} ({1:F5})", title, err);
             AddCheckBox(content, s);
+
+            ErrorList.Add((title, err));
         }
 
         void AddPoints(ICollection<double> X, ICollection<double> Y, String title, MainViewModel m)
@@ -96,11 +106,20 @@ namespace MinQ
             AddPoints(X, Y, "Original", m);
 
             AddCurve((x) => Compute.Linear(x, lin_coeff.a, lin_coeff.b), "Linear", m);
+            AddListItem(String.Format("Linear (a = {0:F4}, b = {1:F4})", lin_coeff.a, lin_coeff.b));
+
             AddCurve((x) => Compute.Power(x, pow_coeff.a, pow_coeff.b), "Power", m);
+            AddListItem(String.Format("Power (a = {0:F4}, b = {1:F4})", pow_coeff.a, pow_coeff.b));
+
             AddCurve((x) => Compute.Exponential(x, exp_coeff.a, exp_coeff.b), "Exponential", m);
+            AddListItem(String.Format("Exponential (a = {0:F4}, b = {1:F4})", exp_coeff.a, exp_coeff.b));
+
             AddCurve((x) => Compute.Quadratic(x, quad_coeff.a, quad_coeff.b, quad_coeff.c), "Quadratic", m);
+            AddListItem(String.Format("Quadratic (a = {0:F4}, b = {1:F4}, c = {2:F4})", quad_coeff.a, quad_coeff.b, quad_coeff.c));
 
             plot.Model = m.MyModel;
+            
+            closest.Content = String.Format("The closest func is {0}", ErrorList.MinBy((x) => x.Item2).Item1);
         }
     }
 }
