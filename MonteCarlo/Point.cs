@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MonteCarlo
 {
-    class Point
+    public class Point
     {
         public Point(double x, double y)
         {

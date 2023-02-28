@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MonteCarlo
 {
-    class Range
+    public class Range
     {
         public Range(double a, double b)
         {

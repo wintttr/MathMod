@@ -23,23 +23,24 @@ namespace MonteCarlo
     {
         private void Button1_Click(object sender, RoutedEventArgs e)
         {
-            Task1 t = new();
+            BasicTaskWindow t = new(new Task1());
             t.ShowDialog();
         }
 
         private void Button2_Click(object sender, RoutedEventArgs e)
         {
-            Task2 t = new();
+            BasicTaskWindow t = new(new Task2());
             t.ShowDialog();
         }
         private void Button3_Click(object sender, RoutedEventArgs e)
         {
-            Task3 t = new();
+            BasicTaskWindow t = new(new Task3());
             t.ShowDialog();
         }
+
         private void Button4_Click(object sender, RoutedEventArgs e)
         {
-            Task4 t = new();
+            BasicTaskWindow t = new(new Task4());
             t.ShowDialog();
         }
     }
