@@ -1,0 +1,24 @@
+﻿<Window xmlns:oxy="http://oxyplot.org/wpf"  x:Class="MonteCarlo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MonteCarlo"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="300" Width="400" ResizeMode="NoResize">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Button Margin="20" Click="Button1_Click">Задание 1</Button>
+        <Button Margin="20" Click="Button2_Click" Grid.Column="1">Задание 2</Button>
+        <Button Margin="20" Click="Button3_Click" Grid.Row="1">Задание 3</Button>
+        <Button Margin="20" Click="Button4_Click" Grid.Row="1" Grid.Column="1">Задание 4</Button>
+    </Grid>
+</Window>
