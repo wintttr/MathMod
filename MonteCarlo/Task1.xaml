@@ -27,7 +27,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBox x:Name="pointsCount" TextAlignment="Center" Margin="30,0,30,0"/>
                 <Button x:Name="generateButton" Margin="10" Grid.Row="1" Click="generateButton_Click">Сгенерировать точки</Button>
-                <Button x:Name="infButton" Margin ="10" Grid.Column="1" Grid.Row="1">Доп. Информация</Button>
+                <Button x:Name="infButton" Margin ="10" Grid.Column="1" Grid.Row="1" Click="infButton_Click">Доп. Информация</Button>
             </Grid>
 
             <Grid Grid.Column="1">

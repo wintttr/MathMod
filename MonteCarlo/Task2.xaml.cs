@@ -73,6 +73,25 @@ namespace MonteCarlo
             return points;
         }
 
+        private void infButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                double appr = ApproximateSquare(points);
+                double exact = ExactSquare();
+
+                double absolute = Math.Abs(appr - exact);
+                double relative = absolute / exact * 100;
+
+                MessageBox.Show(String.Format("Абсолютная погрешность: {0:F4}\nОтносительная погрешность: {1:F4}%", absolute, relative));
+
+            }
+            catch (EmptyListException)
+            {
+                MessageBox.Show("Ашипка! Сгенерируйте точки.");
+            }
+        }
+
         public Task2()
         {
             InitializeComponent();
@@ -92,6 +111,11 @@ namespace MonteCarlo
         private void exactCalc_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show(String.Format("Точная площадь: {0:F4}", ExactSquare()));
+        }
+
+        private void infButton_Click_1(object sender, RoutedEventArgs e)
+        {
+
         }
 
         private void approxCalc_Click(object sender, RoutedEventArgs e)
