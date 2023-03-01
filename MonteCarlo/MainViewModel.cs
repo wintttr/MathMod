@@ -16,6 +16,8 @@ namespace MonteCarlo
 
     public class MainViewModel
     {
+        Dictionary<String, ScatterSeries> _points = new();
+
         public MainViewModel(String title)
         {
             MyModel = new PlotModel { Title = title };
@@ -30,37 +32,39 @@ namespace MonteCarlo
         {
             FunctionSeries s = new FunctionSeries(f, MinX, MaxX, step, title);
             MyModel.Series.Add(s);
-            s.Tag = f;
+
             return s;
         }
 
-        public ScatterSeries AddScatterPoints(String title = "")
+        public ScatterSeries AddScatterSeries(String Tag, String title = "")
         {
-            var scatterSeries = new ScatterSeries { MarkerType = MarkerType.Circle, Title = title };
-                
+            ScatterSeries scatterSeries = new ScatterSeries { MarkerType = MarkerType.Circle, Title = title};
+
             MyModel.Series.Add(scatterSeries);
+
+            _points.Add(Tag, scatterSeries);
 
             return scatterSeries;
         }
 
-        public ScatterSeries AddScatterPoints(ICollection<ScatterPoint> Points, String title = "")
+        public ScatterSeries AddScatterPoints(ICollection<ScatterPoint> Points, String Tag, String title = "")
         {
-            var scatterSeries = new ScatterSeries { MarkerType = MarkerType.Circle, Title = title};
+            ScatterSeries scatterSeries = _points[Tag];
 
             scatterSeries.Points.AddRange(Points);
 
-            MyModel.Series.Add(scatterSeries);
-
             return scatterSeries;
         }
 
-        public ScatterSeries UpdateScatterPoints(ICollection<ScatterPoint> Points, ScatterSeries scatterSeries)
+        public ScatterSeries UpdateScatterPoints(ICollection<ScatterPoint> Points, String Tag)
         {
+            ScatterSeries scatterSeries = _points[Tag];
+
             scatterSeries.Points.Clear();
 
             scatterSeries.Points.AddRange(Points);
 
-            return scatterSeries;
+            return _points[Tag];
         }
 
         public LineSeries AddLineSeries(ICollection<DataPoint> Points, String title = "")

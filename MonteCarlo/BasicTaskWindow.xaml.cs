@@ -21,9 +21,10 @@ namespace MonteCarlo
     /// </summary>
     public partial class BasicTaskWindow : Window
     {
+        const double _pointSize = Constants.PointSize;
+
         Random rand = new();
         MainViewModel model;
-        ScatterSeries innerScatterSeries, outerScatterSeries;
         BasicTask task;
 
         public BasicTaskWindow(BasicTask task)
@@ -36,10 +37,10 @@ namespace MonteCarlo
 
             model = new MainViewModel(task.TaskTitle);
 
-            innerScatterSeries = model.AddScatterPoints();
-            outerScatterSeries = model.AddScatterPoints();
-
             task.AddFuncs(model);
+
+            model.AddScatterSeries("innerScatterSeries");
+            model.AddScatterSeries("outerScatterSeries");
 
             plot.Model = model.MyModel;
         }
@@ -79,19 +80,24 @@ namespace MonteCarlo
             {
                 points_count = Int32.Parse(pointsCount.Text);
 
+                if(points_count < 0)
+                {
+                    throw new NegativeNumberException(points_count);
+                }
+
                 List<Point> points = task.GeneratePoints(points_count, task.GetXRange(), task.GetYRange(), rand);
 
                 List<ScatterPoint> innerPoints = new(), outerPoints = new();
                 foreach (var p in points)
                 {
                     if (task.isInFigure(p))
-                        innerPoints.Add(new ScatterPoint(p.x, p.y));
+                        innerPoints.Add(new ScatterPoint(p.x, p.y, _pointSize));
                     else
-                        outerPoints.Add(new ScatterPoint(p.x, p.y));
+                        outerPoints.Add(new ScatterPoint(p.x, p.y, _pointSize));
                 }
 
-                model.UpdateScatterPoints(innerPoints, innerScatterSeries);
-                model.UpdateScatterPoints(outerPoints, outerScatterSeries);
+                model.UpdateScatterPoints(innerPoints, "innerScatterSeries");
+                model.UpdateScatterPoints(outerPoints, "outerScatterSeries");
 
                 CalculateErrors(points);
                 CalculateAddition(points);
@@ -102,6 +108,10 @@ namespace MonteCarlo
             catch (FormatException)
             {
                 MessageBox.Show("Число имеет неверный формат.");
+            }
+            catch (NegativeNumberException ex)
+            {
+                MessageBox.Show(String.Format("Как я тебе {0} точек нарисую?", ex.number));
             }
         }
     }

@@ -10,5 +10,6 @@ namespace MonteCarlo
     {
         public const double Var = 28;
         public const double Eps = 0.001;
+        public const double PointSize = 2;
     }
 }
