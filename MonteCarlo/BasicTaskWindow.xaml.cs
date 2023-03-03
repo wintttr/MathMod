@@ -63,16 +63,14 @@ namespace MonteCarlo
 
         protected void CalculateErrors(ICollection<Point> points)
         {
-            List<String> errs = new(task.DefaultErrors());
-            errs.AddRange(task.AdditiveErrors());
+            List<String> errs = task.GetErrors(points);
 
             AddToList(errorList.Children, errs);
         }
 
         protected void CalculateAddition(ICollection<Point> points)
         {
-            List<String> calcs = new(task.DefaultCalcs());
-            calcs.AddRange(task.AdditiveCalcs());
+            List<String> calcs = task.GetCalcs(points);
             
             AddToList(calcList.Children, calcs);
         }
@@ -88,7 +86,7 @@ namespace MonteCarlo
                     throw new NegativeNumberException(points_count);
                 }
 
-                List<Point> points = task.GeneratePoints(points_count, task.GetXRange(), task.GetYRange(), rand);
+                List<Point> points = BasicTask.GeneratePoints(points_count, task.GetXRange(), task.GetYRange(), rand);
 
                 List<ScatterPoint> innerPoints = new(), outerPoints = new();
                 foreach (var p in points)

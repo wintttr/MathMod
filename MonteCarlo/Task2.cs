@@ -71,6 +71,16 @@ namespace MonteCarlo
             return sum;
         }
 
+        public override List<string> GetCalcs(ICollection<Point> points)
+        {
+            return DefaultCalcs(points);
+        }
+
+        public override List<string> GetErrors(ICollection<Point> points)
+        {
+            return DefaultErrors(points);
+        }
+
         public override List<List<Point>> GetFuncs()
         {
             return new() { GetFunctionTable(f, new(0,7), gEps) };

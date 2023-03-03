@@ -99,5 +99,15 @@ namespace MonteCarlo
         {
             return new(-b, b);
         }
+
+        public override List<string> GetCalcs(ICollection<Point> points)
+        {
+            return DefaultCalcs(points);
+        }
+
+        public override List<string> GetErrors(ICollection<Point> points)
+        {
+            return DefaultErrors(points);
+        }
     }
 }

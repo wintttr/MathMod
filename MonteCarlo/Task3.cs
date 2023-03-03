@@ -13,12 +13,9 @@ namespace MonteCarlo
         const double variant = Constants.Var;
         const double eps = Constants.ComputeEps;
 
-        public double ApprPI
+        public double ApprPI(ICollection<Point> points)
         {
-            get
-            {
-                return ApproximateSquare() / Math.Pow(variant, 2);
-            }
+            return ApproximateSquare(points) / Math.Pow(variant, 2);
         }
 
         public override string TaskTitle
@@ -66,23 +63,33 @@ namespace MonteCarlo
             return Math.PI * Math.Pow(variant, 2);
         }
 
-        public override List<String> AdditiveCalcs()
+        public List<String> AdditiveCalcs(ICollection<Point> points)
         {
             return new()
             {
-                String.Format("PI = {0:F4}", ApprPI)
+                String.Format("PI = {0:F4}", ApprPI(points))
             };
         }
 
-        public override List<String> AdditiveErrors()
+        public List<String> AdditiveErrors(ICollection<Point> points)
         {
-            double absolute = Math.Abs(Math.PI - ApprPI);
-            double relative = absolute / ApprPI * 100;
+            double absolute = Math.Abs(Math.PI - ApprPI(points));
+            double relative = absolute / ApprPI(points) * 100;
             return new()
             {
                 String.Format("Аболютная погрешность PI: {0:F4}", absolute),
                 String.Format("Относительная погрешность PI: {0:F4}%", relative)
             };
+        }
+
+        public override List<String> GetCalcs(ICollection<Point> points)
+        {
+            return new(Enumerable.Concat(DefaultCalcs(points), AdditiveCalcs(points)));
+        }
+
+        public override List<string> GetErrors(ICollection<Point> points)
+        {
+            return new(Enumerable.Concat(DefaultErrors(points), AdditiveErrors(points)));
         }
     }
 }

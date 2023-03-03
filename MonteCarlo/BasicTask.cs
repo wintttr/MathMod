@@ -10,8 +10,6 @@ namespace MonteCarlo
 {
     abstract public class BasicTask
     {
-        List<Point> points = new();
-
         abstract public String TaskTitle { get; }
 
         abstract public bool isInFigure(Point p);
@@ -24,15 +22,15 @@ namespace MonteCarlo
 
         static protected List<Point> GetFunctionTable(Func<double, double> f, Range r, double eps)
         {
-            List<Point> points = new();
+            List<Point> table = new();
             for (double x = r.Start; x <= r.End; x += eps)
-                points.Add(new(x, f(x)));
-            return points;
+                table.Add(new(x, f(x)));
+            return table;
         }
 
-        virtual public List<String> DefaultErrors()
+        public List<String> DefaultErrors(ICollection<Point> points)
         {
-            double appr = ApproximateSquare();
+            double appr = ApproximateSquare(points);
             double exact = ExactSquare();
 
             double absolute = Math.Abs(appr - exact);
@@ -45,9 +43,9 @@ namespace MonteCarlo
             return new() { absoluteError, relativeError };
         }
 
-        virtual public List<String> DefaultCalcs()
+        public List<String> DefaultCalcs(ICollection<Point> points)
         {
-            double appr = ApproximateSquare();
+            double appr = ApproximateSquare(points);
             double exact = ExactSquare();
 
             String absoluteError = String.Format("Точная площадь: {0:F4}", exact);
@@ -56,17 +54,11 @@ namespace MonteCarlo
             return new() { absoluteError, relativeError };
         }
 
-        virtual public List<String> AdditiveErrors()
-        {
-            return new();
-        }
+        abstract public List<String> GetErrors(ICollection<Point> points);
+        abstract public List<String> GetCalcs(ICollection<Point> points);
 
-        virtual public List<String> AdditiveCalcs()
-        {
-            return new();
-        }
 
-        virtual public double ApproximateSquare()
+        virtual public double ApproximateSquare(ICollection<Point> points)
         {
             if (points.Count() == 0)
                 throw new EmptyListException();
@@ -77,9 +69,9 @@ namespace MonteCarlo
         }
 
 
-        public List<Point> GeneratePoints(int n, Range x_range, Range y_range, Random rand)
+        static public List<Point> GeneratePoints(int n, Range x_range, Range y_range, Random rand)
         {
-            points = new();
+            List<Point> points = new();
             for (int i = 0; i < n; i++)
                 points.Add(Point.RandomPoint(x_range, y_range, rand));
             return points;

@@ -70,7 +70,17 @@ namespace MonteCarlo
             double h = cross().x;
             return 0.5 * h * Math.Abs(F1(0) - F2(0));
         }
-            
+
+        public override List<string> GetCalcs(ICollection<Point> points)
+        {
+            return DefaultCalcs(points);
+        }
+
+        public override List<string> GetErrors(ICollection<Point> points)
+        {
+            return DefaultErrors(points);
+        }
+
         override public List<List<Point>> GetFuncs()
         {
             Range x_range = GetXRange();
