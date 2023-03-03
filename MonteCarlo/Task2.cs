@@ -21,7 +21,9 @@ namespace MonteCarlo
 {
     public class Task2 : BasicTask
     {
-        const double eps = Constants.Eps;
+        const double eps = Constants.ComputeEps;
+        const double gEps = Constants.GraphicsEps;
+
         const double variant = Constants.Var;
         const double a = 0, b = 7;
 
@@ -69,9 +71,9 @@ namespace MonteCarlo
             return sum;
         }
 
-        public override void AddFuncs(MainViewModel model)
+        public override List<List<Point>> GetFuncs()
         {
-            model.AddFunc(f, 0, 7);
+            return new() { GetFunctionTable(f, new(0,7), gEps) };
         }
 
     }

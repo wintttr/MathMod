@@ -37,7 +37,11 @@ namespace MonteCarlo
 
             model = new MainViewModel(task.TaskTitle);
 
-            task.AddFuncs(model);
+
+            var funcs = task.GetFuncs();
+            foreach(List<Point> points in funcs)
+                model.AddLineSeries(new List<DataPoint>(from p in points select new DataPoint(p.x, p.y)));
+            
 
             model.AddScatterSeries("innerScatterSeries");
             model.AddScatterSeries("outerScatterSeries");
@@ -75,10 +79,9 @@ namespace MonteCarlo
 
         protected void generateButton_Click(object sender, RoutedEventArgs e)
         {
-            int points_count;
             try
             {
-                points_count = Int32.Parse(pointsCount.Text);
+                int points_count = Int32.Parse(pointsCount.Text);
 
                 if(points_count < 0)
                 {
@@ -112,6 +115,10 @@ namespace MonteCarlo
             catch (NegativeNumberException ex)
             {
                 MessageBox.Show(String.Format("Как я тебе {0} точек нарисую?", ex.number));
+            }
+            catch (EmptyListException)
+            {
+                MessageBox.Show(String.Format("Введите целое положительное число."));
             }
         }
     }

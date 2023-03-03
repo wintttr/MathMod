@@ -34,6 +34,6 @@
                 <StackPanel x:Name="calcList"></StackPanel>
             </GroupBox>
         </Grid>
-        <oxy:PlotView x:Name="plot" Width="{Binding ActualHeight, ElementName=plot, Mode=OneWay}"/>
+        <oxy:PlotView x:Name="plot"/>
     </Grid>
 </Window>

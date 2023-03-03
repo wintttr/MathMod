@@ -9,7 +9,7 @@ namespace MonteCarlo
 {
     public class Task4 : BasicTask
     {
-        const double eps = Constants.Eps;
+        const double eps = Constants.ComputeEps;
 
         const double variant = Constants.Var;
 
@@ -54,13 +54,13 @@ namespace MonteCarlo
             return A * Math.Pow(Math.Cos(x), 2) + B * Math.Pow(Math.Sin(x), 2);
         }
 
-        static List<DataPoint> GetFigurePoints()
+        static List<Point> GetFigurePoints()
         {
-            List<DataPoint> DP = new();
+            List<Point> DP = new();
 
             for (double rad = 0; rad <= Math.PI * 2; rad += eps)
             {
-                DP.Add(new DataPoint(phi(rad) * Math.Cos(rad), phi(rad) * Math.Sin(rad)));
+                DP.Add(new Point(phi(rad) * Math.Cos(rad), phi(rad) * Math.Sin(rad)));
             }
 
             return DP;
@@ -84,9 +84,9 @@ namespace MonteCarlo
             return false;
         }
 
-        public override void AddFuncs(MainViewModel model)
+        public override List<List<Point>> GetFuncs()
         {
-            model.AddLineSeries(GetFigurePoints());
+            return new() { GetFigurePoints() };
         }
 
         public override Range GetXRange()

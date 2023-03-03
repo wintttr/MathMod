@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -19,7 +20,15 @@ namespace MonteCarlo
 
         abstract public Range GetXRange();
         abstract public Range GetYRange();
-        abstract public void AddFuncs(MainViewModel model);
+        abstract public List<List<Point>> GetFuncs();
+
+        static protected List<Point> GetFunctionTable(Func<double, double> f, Range r, double eps)
+        {
+            List<Point> points = new();
+            for (double x = r.Start; x <= r.End; x += eps)
+                points.Add(new(x, f(x)));
+            return points;
+        }
 
         virtual public List<String> DefaultErrors()
         {

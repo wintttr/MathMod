@@ -21,7 +21,7 @@ namespace MonteCarlo
 
         static double RandomDouble(Range range, Random rand)
         {
-            return RandomDouble(range.a, range.b, rand);
+            return RandomDouble(range.Start, range.End, rand);
         }
 
         static public Point RandomPoint(Range x_range, Range y_range, Random rand)

@@ -22,6 +22,7 @@ namespace MonteCarlo
     public class Task1 : BasicTask
     {
         const double variant = Constants.Var;
+        const double eps = Constants.GraphicsEps;
 
         public override string TaskTitle
         {
@@ -69,14 +70,16 @@ namespace MonteCarlo
             double h = cross().x;
             return 0.5 * h * Math.Abs(F1(0) - F2(0));
         }
-
-        override public void AddFuncs(MainViewModel model)
+            
+        override public List<List<Point>> GetFuncs()
         {
             Range x_range = GetXRange();
-            Range y_range = GetYRange();
 
-            model.AddFunc(Task1.F1, x_range.a, x_range.b);
-            model.AddFunc(Task1.F2, x_range.a, x_range.b);
+            return new() 
+            { 
+                GetFunctionTable(F1, x_range, eps), 
+                GetFunctionTable(F2, x_range, eps) 
+            };
         }
     }
 }

@@ -11,7 +11,7 @@ namespace MonteCarlo
     public class Task3 : BasicTask
     {
         const double variant = Constants.Var;
-        const double eps = Constants.Eps;
+        const double eps = Constants.ComputeEps;
 
         public double ApprPI
         {
@@ -29,21 +29,21 @@ namespace MonteCarlo
             }
         }
 
-        static List<DataPoint> GetCirclePoints()
+        static List<Point> GetCirclePoints()
         {
-            List<DataPoint> DP = new();
+            List<Point> points = new();
 
             for (double rad = 0; rad <= Math.PI * 2; rad += eps)
             {
-                DP.Add(new DataPoint(variant * Math.Cos(rad), variant * Math.Sin(rad)));
+                points.Add(new(variant * Math.Cos(rad), variant * Math.Sin(rad)));
             }
 
-            return DP;
+            return points;
         }
 
-        public override void AddFuncs(MainViewModel model)
+        public override List<List<Point>> GetFuncs()
         {
-            model.AddLineSeries(GetCirclePoints());
+            return new() { GetCirclePoints() };
         }
 
         public override bool isInFigure(Point p)

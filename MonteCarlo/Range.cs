@@ -13,19 +13,19 @@ namespace MonteCarlo
             if (a > b)
                 (a, b) = (b, a);
 
-            this.a = a;
-            this.b = b;
+            this.Start = a;
+            this.End = b;
         }
 
         public double Diff
         {
             get
             {
-                return b - a;
+                return End - Start;
             }
         }
 
-        public double a { get; set; }
-        public double b { get; set; }
+        public double Start { get; set; }
+        public double End { get; set; }
     }
 }
