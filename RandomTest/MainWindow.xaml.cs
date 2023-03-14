@@ -27,14 +27,14 @@ namespace RandomTest
             plot.Model = model.Model;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void GenerateNums(Func<double> RandomFunc)
         {
             try
             {
                 int k = Int32.Parse(segmentSplit.Text);
                 int n = Int32.Parse(numbersCount.Text);
 
-                List<double> nums = TestClass.GenerateRandomList(n, rand.NextDouble);
+                List<double> nums = TestClass.GenerateRandomList(n, RandomFunc);
 
                 List<HistogramItem> histList = new();
                 foreach (TaggedRange h in TestClass.GetFreqList(nums, k))
@@ -69,6 +69,34 @@ namespace RandomTest
             {
                 MessageBox.Show("Типа обработал ошибку.");
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            long milliseconds = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            MidSquares ms = new((uint)milliseconds % 10000);
+            GenerateNums(ms.NextDouble);
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            long milliseconds = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            MidMult mm = new((uint)milliseconds % 10000);
+            GenerateNums(mm.NextDouble);
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            long milliseconds = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            Shuffle ss = new((uint)milliseconds % 100000000);
+            GenerateNums(ss.NextDouble);
+        }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            long milliseconds = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            LKM lkm = new((uint)milliseconds, 2*3*25*7+1, 103, 2*3*3*5*7*9);
+            GenerateNums(lkm.NextDouble);
         }
     }
 }

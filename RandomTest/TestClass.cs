@@ -17,6 +17,101 @@ namespace RandomTest
         public double Value { get; private set; }
     }
 
+    public class MidSquares
+    {
+        uint _current;
+        
+        public MidSquares(uint number)
+        {
+            _current = number;
+        }
+        
+        public double NextDouble()
+        {
+            _current = (uint)(Math.Pow(_current, 2) / 100.0) % 10000;
+            return _current / 10000.0;
+        }
+    }
+
+    public class MidMult
+    {
+        uint _current1, _current2;
+
+        static public uint MidQuad(uint x)
+        {
+            unchecked
+            {
+                return (uint)(Math.Pow(x, 2) / 100.0) % 10000;
+            }
+        }
+
+        public MidMult(uint number)
+        {
+            _current1 = MidQuad(number);
+            _current2 = number * MidQuad(number);
+        }
+        
+        public double NextDouble()
+        {
+            unchecked
+            {
+                uint next = MidQuad(_current2);
+
+                _current2 = _current1 * next;
+                _current1 = next;
+                return next / 10000.0;
+            }
+        }
+    }
+
+    public class Shuffle
+    {
+        uint _current;
+
+        public Shuffle(uint number)
+        {
+            _current = number;
+        }
+
+        public double NextDouble()
+        {
+            unchecked
+            {
+                uint r0l = _current * 100 + _current % 100;
+                uint r0r = _current / 100 + _current / 1000000 * 1000000;
+
+                _current = (r0l + r0r) % 100000000;
+
+                return _current / 100000000.0;
+            }
+        }
+    }
+
+    public class LKM
+    {
+        int k, b, M;
+        uint _current;
+
+        public LKM(uint number, int k, int b, int M)
+        {
+            _current = number;
+
+            this.k = k;
+            this.b = b;
+            this.M = M;
+        }
+
+        public double NextDouble()
+        {
+            unchecked
+            {
+                _current = (uint)((k * _current + b) % M);
+
+                return _current / (double)M;
+            }
+        }
+    }
+
     public class TestClass
     {
         static public List<double> GenerateRandomList(int n, Func<double> randFunc)
