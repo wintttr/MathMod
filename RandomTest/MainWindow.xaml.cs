@@ -71,31 +71,44 @@ namespace RandomTest
             }
         }
 
+        private uint get_seed()
+        {
+            try
+            {
+                return UInt32.Parse(seed.Text);
+            }
+            catch (Exception) 
+            {
+                seed.Text = "";
+                return (uint) (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond); 
+            }
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            long milliseconds = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-            MidSquares ms = new((uint)milliseconds % 10000);
+            uint actual_seed = get_seed();
+            MidSquares ms = new(actual_seed);
             GenerateNums(ms.NextDouble);
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            long milliseconds = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-            MidMult mm = new((uint)milliseconds % 10000);
+            uint actual_seed = get_seed();
+            MidMult mm = new(actual_seed);
             GenerateNums(mm.NextDouble);
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            long milliseconds = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-            Shuffle ss = new((uint)milliseconds % 100000000);
+            uint actual_seed = get_seed();
+            Shuffle ss = new(actual_seed);
             GenerateNums(ss.NextDouble);
         }
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
-            long milliseconds = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-            LKM lkm = new((uint)milliseconds, 2*3*25*7+1, 103, 2*3*3*5*7*9);
+            uint actual_seed = get_seed();
+            LKM lkm = new(actual_seed, 2*3*25*7+1, 103, 2*3*3*5*7*9);
             GenerateNums(lkm.NextDouble);
         }
     }

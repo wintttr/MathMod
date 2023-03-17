@@ -23,7 +23,7 @@ namespace RandomTest
         
         public MidSquares(uint number)
         {
-            _current = number;
+            _current = number % 10000;
         }
         
         public double NextDouble()
@@ -47,8 +47,8 @@ namespace RandomTest
 
         public MidMult(uint number)
         {
-            _current1 = MidQuad(number);
-            _current2 = number * MidQuad(number);
+            _current1 = MidQuad(number) % 10000;
+            _current2 = (number * MidQuad(number)) % 10000;
         }
         
         public double NextDouble()
@@ -70,7 +70,7 @@ namespace RandomTest
 
         public Shuffle(uint number)
         {
-            _current = number;
+            _current = number % 10000;
         }
 
         public double NextDouble()
