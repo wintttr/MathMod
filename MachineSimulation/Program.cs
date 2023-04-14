@@ -92,10 +92,9 @@
 
             for (int i = 0; i < DetailsCount; i++)
             {
-                double MachineBreak = 0;
                 if (PassedTime >= NextBreak)
                 {
-                    MachineBreak = UniformDistrib(0.1, 0.5);
+                    double MachineBreak = UniformDistrib(0.1, 0.5);
 
                     PassedTime += MachineBreak;
                     BreakTime += MachineBreak;
@@ -104,18 +103,23 @@
                     BreakCount++;
                 }
 
+                double NextDetail = PassedTime + ExpDistrib(0, 1);
+
                 double MachineSetup = UniformDistrib(0.2, 0.5);
                 double DetailTime = MachineSetup + NormalDistrib(0.5, 0.1);
 
-                double DetailDelay;
-                if (DetailTime + MachineBreak > 1)
-                    DetailDelay = 0;
-                else
-                    DetailDelay = ExpDistrib(0, 1.2 - (DetailTime + MachineBreak));
-
                 UsefulTime += DetailTime;
+                PassedTime += DetailTime;
+
+                double DetailDelay = 0;
+
+                if (PassedTime < NextDetail)
+                {
+                    DetailDelay = NextDetail - PassedTime;
+                    PassedTime = NextDetail;
+                }
+
                 DelayTime += DetailDelay;
-                PassedTime += (DetailTime + DetailDelay);
             }
 
             Console.WriteLine("Общее время работы: {0:F2} часов", PassedTime);
