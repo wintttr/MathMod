@@ -140,7 +140,7 @@
             Console.WriteLine();
             Console.WriteLine("---");
             Console.WriteLine();
-            Console.WriteLine("Время выполнения: {0} мин", Time);
+            Console.WriteLine("Время выполнения: {0} мин", Time - 1);
             Console.WriteLine();
             Console.WriteLine("---");
             Console.WriteLine();
@@ -149,8 +149,8 @@
             Console.WriteLine();
             Console.WriteLine("---");
             Console.WriteLine();
-            Console.WriteLine("Время простоя 1 ЭВМ: {0} мин", Time - TimePC1);  
-            Console.WriteLine("Время простоя 2 ЭВМ: {0} мин", Time - TimePC2);
+            Console.WriteLine("Время простоя 1 ЭВМ: {0} мин", Time - TimePC1 - 1);  
+            Console.WriteLine("Время простоя 2 ЭВМ: {0} мин", Time - TimePC2 - 1);
             Console.WriteLine();
             Console.WriteLine("---");
             Console.WriteLine();
