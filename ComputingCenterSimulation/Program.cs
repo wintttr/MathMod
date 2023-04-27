@@ -1,8 +1,12 @@
-﻿namespace ComputingCenterSimulation
+﻿using System.Runtime.CompilerServices;
+
+namespace ComputingCenterSimulation
 {
     class Program
     {
-        enum UsedComputer { FIRST, SECOND, NONE };
+
+        enum TaskType { NONE, ERROR, CORRECT };
+        enum SpecialistDuty { SIGN_SORT, FIRST_ERROR, SECOND_ERROR, NONE };
 
         static Random _random = new();
 
@@ -13,148 +17,213 @@
         
         static void Main(string[] args)
         {
-            int TaskCount = 0;
+            int TaskCount = 100;
+            int TaskDelay = 2;
+            int ErrorPercent = 70;
+            int ErrorSolveTime = 3;
+            int SignSortTime = 12;
 
-            while (true)
-            {
-                Console.Write("Введите количество заданий: ");
-                try
-                {
-                    TaskCount = Int32.Parse(Console.ReadLine());
-                    break;
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("Неверный формат числа, попробуйте ещё раз.");
-                    Console.WriteLine();
-                }
-            }
-            Console.WriteLine();
-
-            int TSSAllTime = 0;
-            int CurrentTaskSignSort = 0;
-            int TaskSignSortTime = 0;
-
-            Queue<int> TaskList = new();
-
-            Queue<int> TaskListPC1 = new();
-            Queue<int> TaskListPC2 = new();
-
-            int SpecialistTime = 0;
-            int SpecialistInaction = 0;
-
-            UsedComputer used = UsedComputer.NONE;
+            Queue<TaskType> InputQueue = new();
+            Queue<TaskType> PC1TaskQueue = new();
+            Queue<TaskType> PC2TaskQueue = new();
 
             int Time = 0;
 
-            int TimePC1 = 0;
-            int TimePC2 = 0;
-
             int TasksPC1 = 0;
-            int TasksPC2 = 0;
+            int TasksPC1WE = 0;
 
+            int TasksPC2 = 0;
+            int TasksPC2WE = 0;
+
+            int PC1WorkTime = 0;
+            int PC2WorkTime = 0;
+
+            int PC1DownTime = 0;
+            int PC2DownTime = 0;
+
+            (int, TaskType) PC1CurrentTask = (0, TaskType.NONE);
+            (int, TaskType) PC2CurrentTask = (0, TaskType.NONE);
+
+            int specialistTime = 0;
+
+            int specialistWork = 0;
+            int specialistIdle = 0;
+            int specialistError = 0;
+
+            int errorTime = 0;
+            int errorCount = 0;
+            SpecialistDuty specialistDuty = SpecialistDuty.NONE;
+            SpecialistDuty prevDuty = SpecialistDuty.NONE;
 
             for(; TasksPC1 + TasksPC2 < TaskCount; Time++)
             {
-                if (TaskSignSortTime > 0)
+                if (Time % TaskDelay == 0)
+                    InputQueue.Enqueue(CasePercent(ErrorPercent) ? TaskType.ERROR : TaskType.CORRECT);
+
+                if (InputQueue.Count != 0 && specialistDuty == SpecialistDuty.NONE)
                 {
-                    --TaskSignSortTime;
-                    TSSAllTime++;
+                    specialistDuty = SpecialistDuty.SIGN_SORT;
+                    specialistTime = SignSortTime;
                 }
 
-                if (TaskSignSortTime == 0)
+                if (PC1CurrentTask.Item1 > 0)
                 {
-                    if (CurrentTaskSignSort != 0)
-                    {
-                        if (TaskListPC1.Count > TaskListPC2.Count)
-                            TaskListPC2.Enqueue(CurrentTaskSignSort);
-                        else
-                            TaskListPC1.Enqueue(CurrentTaskSignSort);
-                        CurrentTaskSignSort = 0;
-                    }
-                    
+                    PC1CurrentTask.Item1--;
+                    PC1WorkTime++;
                 }
+                else
+                    PC1DownTime++;
 
-                if (Time % 2 == 0)
-                    TaskList.Enqueue(CasePercent(70) ? 23 : 10);
-
-                if(TaskList.Count != 0 && TaskSignSortTime == 0)
+                if(PC2CurrentTask.Item1 > 0)
                 {
-                    TaskSignSortTime = 12;
-                    CurrentTaskSignSort = TaskList.Dequeue();
+                    PC2CurrentTask.Item1--;
+                    PC2WorkTime++;
                 }
+                else
+                    PC2DownTime++;
 
-                if(used == UsedComputer.FIRST)
+                if (PC1CurrentTask.Item1 == 0)
                 {
-                    if (SpecialistTime > 0)
-                    {
-                        SpecialistTime--;
-                        TimePC1++;
-                    }
-                    
-                    if (SpecialistTime == 0)
-                    {
-                        TasksPC1++;
 
-                        TaskListPC1.Dequeue();
-                        used = UsedComputer.NONE;
-                    }
-                }
-
-                if(used == UsedComputer.SECOND)
-                {
-                    if (SpecialistTime > 0)
+                    switch (PC1CurrentTask.Item2)
                     {
-                        SpecialistTime--;
-                        TimePC2++;
-                    }
-                    
-                    if (SpecialistTime == 0)
-                    {
-                        TasksPC2++;
-                        TaskListPC2.Dequeue();
-                        used = UsedComputer.NONE;
+                        case TaskType.CORRECT:
+                            TasksPC1++;
+                            PC1CurrentTask.Item1 = 0;
+                            PC1CurrentTask.Item2 = TaskType.NONE;
+                            break;
+                        case TaskType.ERROR:
+                            if (specialistDuty != SpecialistDuty.FIRST_ERROR && specialistDuty != SpecialistDuty.SECOND_ERROR)
+                            {
+                                TasksPC1WE++;
+                                errorTime = ErrorSolveTime;
+                                prevDuty = specialistDuty;
+                                specialistDuty = SpecialistDuty.FIRST_ERROR;
+                            }
+                            break;
                     }
                 }
 
-                if(used == UsedComputer.NONE)
+                if (PC2CurrentTask.Item1 == 0)
                 {
-                    if (TaskListPC1.Count > TaskListPC2.Count && TaskListPC1.Count != 0)
+
+                    switch (PC2CurrentTask.Item2)
                     {
-                        used = UsedComputer.FIRST;
-                        SpecialistTime = TaskListPC1.First();
+                        case TaskType.CORRECT:
+                            TasksPC2++;
+                            PC2CurrentTask.Item1 = 0;
+                            PC2CurrentTask.Item2 = TaskType.NONE;
+                            break;
+                        case TaskType.ERROR:
+                            if (specialistDuty != SpecialistDuty.FIRST_ERROR && specialistDuty != SpecialistDuty.SECOND_ERROR)
+                            {
+                                TasksPC2WE++;
+                                errorTime = ErrorSolveTime;
+                                prevDuty = specialistDuty;
+                                specialistDuty = SpecialistDuty.SECOND_ERROR;
+                            }
+                            break;
                     }
-                    else if (TaskListPC1.Count <= TaskListPC2.Count && TaskListPC2.Count != 0)
-                    {
-                        used = UsedComputer.SECOND;
-                        SpecialistTime = TaskListPC2.First();
-                    }
-                    else
-                    {
-                        SpecialistInaction++;
-                    }
+                }
+
+                if (PC1TaskQueue.Count != 0 && PC1CurrentTask.Item2 == TaskType.NONE)
+                {
+                    TaskType newTask = PC1TaskQueue.Dequeue();
+                    PC1CurrentTask = (10, newTask);
+                }
+
+                if (PC2TaskQueue.Count != 0 && PC2CurrentTask.Item2 == TaskType.NONE)
+                {
+                    TaskType newTask = PC2TaskQueue.Dequeue();
+                    PC2CurrentTask = (10, newTask);
+                }
+
+                switch(specialistDuty)
+                {
+                    case SpecialistDuty.SIGN_SORT:
+                        if (specialistTime > 0)
+                        {
+                            specialistTime--;
+                            specialistWork++;
+                        }
+
+                        if(specialistTime == 0)
+                        {
+                            if (CasePercent(50))
+                                PC2TaskQueue.Enqueue(InputQueue.Dequeue());
+                            else
+                                PC1TaskQueue.Enqueue(InputQueue.Dequeue());
+
+                            specialistDuty = SpecialistDuty.NONE;
+                        }
+                        break;
+
+                    case SpecialistDuty.FIRST_ERROR:
+                        if (errorTime > 0)
+                        {
+                            errorTime--;
+                            specialistError++;
+                        }
+
+                        if (errorTime == 0)
+                        {
+                            errorCount++;
+                            PC1TaskQueue.Enqueue(TaskType.CORRECT);
+                            PC1CurrentTask = (0, TaskType.NONE);
+
+                            specialistDuty = prevDuty;
+                        }
+                        break;
+
+                    case SpecialistDuty.SECOND_ERROR:
+                        if (errorTime > 0)
+                        {
+                            errorTime--;
+                            specialistError++;
+                        }
+
+                        if (errorTime == 0)
+                        {
+                            errorCount++;
+                            PC2TaskQueue.Enqueue(TaskType.CORRECT);
+                            PC2CurrentTask = (0, TaskType.NONE);
+
+                            specialistDuty = prevDuty;
+                        }
+                        break;
+
+                    case SpecialistDuty.NONE:
+                        specialistIdle++;
+                        break;
                 }
             }
+            
 
-            Console.WriteLine("Количество заданий: {0}", TaskCount);
+            Console.WriteLine($"Количество заданий: {TaskCount}");
             Console.WriteLine();
             Console.WriteLine("---");
             Console.WriteLine();
-            Console.WriteLine("Время выполнения: {0} мин", Time - 1);
+            Console.WriteLine($"Время работы: {Time} мин");
             Console.WriteLine();
             Console.WriteLine("---");
             Console.WriteLine();
-            Console.WriteLine("Полезное время 1 ЭВМ: {0} мин, количество заданий: {1}", TimePC1, TasksPC1);
-            Console.WriteLine("Полезное время 2 ЭВМ: {0} мин, количество заданий: {1}", TimePC2, TasksPC2);
+            Console.WriteLine($"{InputQueue.Count} задач осталось в очереди");
             Console.WriteLine();
             Console.WriteLine("---");
             Console.WriteLine();
-            Console.WriteLine("Время простоя 1 ЭВМ: {0} мин", Time - TimePC1 - 1);  
-            Console.WriteLine("Время простоя 2 ЭВМ: {0} мин", Time - TimePC2 - 1);
+            Console.WriteLine($"Полезное время 1 ЭВМ: {PC1WorkTime} мин, количество заданий: {TasksPC1}, из них с ошибкой {TasksPC1WE}");
+            Console.WriteLine($"Полезное время 2 ЭВМ: {PC2WorkTime} мин, количество заданий: {TasksPC2}, из них с ошибкой {TasksPC2WE}");
             Console.WriteLine();
             Console.WriteLine("---");
             Console.WriteLine();
-            Console.WriteLine("Время бездействия оператора: {0}", SpecialistInaction);
+            Console.WriteLine($"Время простоя 1 ЭВМ: {PC1DownTime} мин");  
+            Console.WriteLine($"Время простоя 2 ЭВМ: {PC2DownTime} мин");
+            Console.WriteLine();
+            Console.WriteLine("---");
+            Console.WriteLine();
+            Console.WriteLine($"Время регистрации и сортировки: {specialistWork}");
+            Console.WriteLine($"Время простоя оператора: {specialistIdle}");
+            Console.WriteLine($"Время исправления ошибок: {specialistError}");
         }
     }
 }
