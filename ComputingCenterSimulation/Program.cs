@@ -14,14 +14,28 @@ namespace ComputingCenterSimulation
         {
             return _random.Next(0, 100) < percent;
         }
+
+        static int? ReadInt(string prompt)
+        {
+            Console.Write(prompt);
+            try
+            {
+                return Int32.Parse(Console.ReadLine());
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
         
         static void Main(string[] args)
         {
-            int TaskCount = 100;
-            int TaskDelay = 2;
-            int ErrorPercent = 70;
-            int ErrorSolveTime = 3;
-            int SignSortTime = 12;
+            int TaskCount = ReadInt("Введите количество заданий: ") ?? 100;
+            int TaskDelay = ReadInt("Введите промежуток времени между заданиями: ") ?? 2;
+            int ErrorPercent = ReadInt("Введите вероятность нахождения ошибки: ") ?? 70;
+            int ErrorSolveTime = ReadInt("Введите время исправления ошибки: ") ?? 3;
+            int SignSortTime = ReadInt("Введите время сортировки и регистрации: ") ?? 12;
+            int ComputingTime = ReadInt("Введите время решения задания ЭВМ: ") ?? 10;
 
             Queue<TaskType> InputQueue = new();
             Queue<TaskType> PC1TaskQueue = new();
@@ -40,6 +54,8 @@ namespace ComputingCenterSimulation
 
             int PC1DownTime = 0;
             int PC2DownTime = 0;
+
+            int ParallelComputing = 0;
 
             (int, TaskType) PC1CurrentTask = (0, TaskType.NONE);
             (int, TaskType) PC2CurrentTask = (0, TaskType.NONE);
@@ -65,6 +81,9 @@ namespace ComputingCenterSimulation
                     specialistDuty = SpecialistDuty.SIGN_SORT;
                     specialistTime = SignSortTime;
                 }
+
+                if (PC1CurrentTask.Item1 > 0 && PC2CurrentTask.Item1 > 0)
+                    ParallelComputing++;
 
                 if (PC1CurrentTask.Item1 > 0)
                 {
@@ -129,13 +148,13 @@ namespace ComputingCenterSimulation
                 if (PC1TaskQueue.Count != 0 && PC1CurrentTask.Item2 == TaskType.NONE)
                 {
                     TaskType newTask = PC1TaskQueue.Dequeue();
-                    PC1CurrentTask = (10, newTask);
+                    PC1CurrentTask = (ComputingTime, newTask);
                 }
 
                 if (PC2TaskQueue.Count != 0 && PC2CurrentTask.Item2 == TaskType.NONE)
                 {
                     TaskType newTask = PC2TaskQueue.Dequeue();
-                    PC2CurrentTask = (10, newTask);
+                    PC2CurrentTask = (ComputingTime, newTask);
                 }
 
                 switch(specialistDuty)
@@ -200,30 +219,30 @@ namespace ComputingCenterSimulation
             
 
             Console.WriteLine($"Количество заданий: {TaskCount}");
-            Console.WriteLine();
-            Console.WriteLine("---");
-            Console.WriteLine();
+            Console.WriteLine("\n---\n");
             Console.WriteLine($"Время работы: {Time} мин");
-            Console.WriteLine();
-            Console.WriteLine("---");
-            Console.WriteLine();
+            Console.WriteLine("\n---\n");
             Console.WriteLine($"{InputQueue.Count} задач осталось в очереди");
+            Console.WriteLine("\n---\n");
+            Console.WriteLine($"Полезное время 1 ЭВМ: {PC1WorkTime} мин\n\tКоличество заданий: {TasksPC1}, из них с ошибкой {TasksPC1WE}");
             Console.WriteLine();
-            Console.WriteLine("---");
-            Console.WriteLine();
-            Console.WriteLine($"Полезное время 1 ЭВМ: {PC1WorkTime} мин, количество заданий: {TasksPC1}, из них с ошибкой {TasksPC1WE}");
-            Console.WriteLine($"Полезное время 2 ЭВМ: {PC2WorkTime} мин, количество заданий: {TasksPC2}, из них с ошибкой {TasksPC2WE}");
-            Console.WriteLine();
-            Console.WriteLine("---");
-            Console.WriteLine();
-            Console.WriteLine($"Время простоя 1 ЭВМ: {PC1DownTime} мин");  
-            Console.WriteLine($"Время простоя 2 ЭВМ: {PC2DownTime} мин");
-            Console.WriteLine();
-            Console.WriteLine("---");
-            Console.WriteLine();
+            Console.WriteLine($"Полезное время 2 ЭВМ: {PC2WorkTime} мин\n\tКоличество заданий: {TasksPC2}, из них с ошибкой {TasksPC2WE}");
+            Console.WriteLine("\n---\n");
+            Console.WriteLine($"Время простоя 1 ЭВМ: {PC1DownTime} мин, {PC1DownTime / (double)Time * 100,0:F2}%");  
+            Console.WriteLine($"Время простоя 2 ЭВМ: {PC2DownTime} мин, {PC2DownTime / (double)Time * 100,0:F2}%");
+            Console.WriteLine("\n---\n");
             Console.WriteLine($"Время регистрации и сортировки: {specialistWork}");
-            Console.WriteLine($"Время простоя оператора: {specialistIdle}");
+
+            // Console.WriteLine($"Время простоя оператора: {specialistIdle}");
+            
             Console.WriteLine($"Время исправления ошибок: {specialistError}");
-        }
+            Console.WriteLine("\n---\n");
+            Console.WriteLine($"Интенсивность нагрузки: {(InputQueue.Count + TaskCount) / (double)TaskCount,0:F2}");
+            Console.WriteLine($"Пропускная способность: {TaskCount / (double)Time,0:F2} задач в минуту");
+            Console.WriteLine($"Среднее время в очереди: {SignSortTime + specialistError / (double)TaskCount} минут");
+            Console.WriteLine($"Среднее время выполнения задания: {(PC1WorkTime + PC2WorkTime + specialistError) / (double) TaskCount} минут");
+            Console.WriteLine($"Среднее количество задействованных каналов: {ParallelComputing / ((TaskCount * ComputingTime + (TasksPC1WE + TasksPC2WE) * ComputingTime) / 2.0) * 2.0,0:F2}");
+            Console.WriteLine($"Среднее число заданий в очереди: {(TaskCount + InputQueue.Count) / (double)Time,0:F2}");
+        }   
     }
 }
